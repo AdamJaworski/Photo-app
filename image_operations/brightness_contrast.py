@@ -5,7 +5,7 @@ import numpy
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.image_cv2
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
 
     def __on_close():
         settings_window.destroy()
@@ -13,7 +13,7 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_cancel():
-        public_resources.current_image_class.image_cv2 = image_copy
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
         __on_close()
 
     @public_resources.refresh_viewport
@@ -24,7 +24,7 @@ def start_gui():
             output_cv2 = numpy.power(output_cv2, contrast_)
             output_cv2 = numpy.add(output_cv2, brightness.get())
             output_cv2 = numpy.clip(output_cv2, 0, 255)
-            public_resources.current_image_class.image_cv2 = output_cv2.astype(numpy.uint8)
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2.astype(numpy.uint8)
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -39,7 +39,7 @@ def start_gui():
         if preview.get():
             __on_value_change()
         else:
-            public_resources.current_image_class.image_cv2 = image_copy
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
 
     settings_window = customtkinter.CTkToplevel()
     settings_window.geometry(f"320x180+{public_resources.screen_width-340}+10")

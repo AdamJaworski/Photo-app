@@ -5,7 +5,7 @@ import public_resources
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.image_cv2
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
 
     def __on_close():
         settings_window.destroy()
@@ -13,15 +13,16 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_cancel():
-        public_resources.current_image_class.image_cv2 = image_copy
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
         __on_close()
 
     @public_resources.refresh_viewport
     def __on_value_change(event=None):
-        if preview.get():
-            public_resources.current_image_class.image_cv2 = cv2.bilateralFilter(image_copy, int(slider_d.get()),
-                                                                                 slider_strength.get(),
-                                                                                 slider_strength.get())
+        if not preview.get():
+            return
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = cv2.bilateralFilter(image_copy, int(slider_d.get()),
+                                                                                                                                slider_strength.get(),
+                                                                                                                                slider_strength.get())
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -36,7 +37,7 @@ def start_gui():
         if preview.get():
             __on_value_change()
         else:
-            public_resources.current_image_class.image_cv2 = image_copy
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
 
     if public_resources.is_image_operation_window_open:
         return

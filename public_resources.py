@@ -1,6 +1,7 @@
 import threading
 from PIL.Image import BICUBIC
 from HistoryLog import HistoryLog
+from ImageClass import ImageClass
 import time
 
 
@@ -9,7 +10,7 @@ def empty_function(*args):
 
 
 update_viewport_on_new_thread = True
-current_image_class = None
+current_image_class: ImageClass
 display_rescale_methode = BICUBIC
 default_image_height = 600
 default_image_width = 900
@@ -53,7 +54,7 @@ def refresh_viewport(func):
 def save_state(func):
     def wrapper():
         operation_name = func()
-        new_log = HistoryLog(current_image_class.image_cv2, operation_name)
+        new_log = HistoryLog(current_image_class.layers[current_image_class.active_layer][0], operation_name, current_image_class.layers[current_image_class.active_layer][1])
         current_image_class.image_operations_history.append(new_log)
         on_new_history_log(new_log)
     return wrapper

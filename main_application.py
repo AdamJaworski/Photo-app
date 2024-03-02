@@ -52,7 +52,7 @@ def __set_image_active(image_: ImageClass):
 def __update_image(image_: ImageClass):
     if image_ is None:
         return
-    current_image_label.configure(image=ImageTk.PhotoImage(image_.get_image_pil()))
+    current_image_label.configure(image=ImageTk.PhotoImage(image_.get_display_image()))
 
 
 def __refresh_image_buttons():
@@ -102,7 +102,6 @@ def close():
         current_image_label.configure(image=None)
 
     __refresh_image_buttons()
-
 
 
 def save():
@@ -176,14 +175,17 @@ def image_menu(choice):
 def check():
     os.system('cls')
     print("-"*20)
-    print(f"Number of open images: {len(open_images_list)}")
+    # print(f"Number of open images: {len(open_images_list)}")
     print(f"Number of active threads: {threading.active_count()}")
-    print(f"update_viewport_on_new_thread: {True if public_resources.update_viewport_on_new_thread else False}")
+    print(f"Update viewport on new thread: {True if public_resources.update_viewport_on_new_thread else False}")
     print(f"Limit of history logs: {public_resources.image_history_limit}")
     print(f"RAM used: {psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2:.2f} MB")
+    if public_resources.current_image_class is not None:
+        public_resources.current_image_class.benchmark_methode()
     print("-" * 20)
 
 
+public_resources.current_image_class = None
 # Frame
 app = customtkinter.CTk()
 app.title("Project Alpha")

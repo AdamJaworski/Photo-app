@@ -6,8 +6,8 @@ import numpy
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.image_cv2
-    image_copy_rgb = cv2.cvtColor(public_resources.current_image_class.image_cv2, cv2.COLOR_BGR2RGB)
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
+    image_copy_rgb = cv2.cvtColor(public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0], cv2.COLOR_BGR2RGB)
 
     def __on_close():
         settings_window.destroy()
@@ -15,7 +15,7 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_cancel():
-        public_resources.current_image_class.image_cv2 = image_copy
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
         __on_close()
 
     @public_resources.refresh_viewport
@@ -32,7 +32,7 @@ def start_gui():
                 b = numpy.clip(numpy.add(b.astype(numpy.float32), (slider_b.get() - 1)*15).astype("uint8"), 0, 255)
             output_rgb = cv2.merge([r, g, b])
             output_cv2 = cv2.cvtColor(output_rgb, cv2.COLOR_RGB2BGR)
-            public_resources.current_image_class.image_cv2 = output_cv2
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -47,7 +47,7 @@ def start_gui():
         if preview.get():
             __on_value_change()
         else:
-            public_resources.current_image_class.image_cv2 = image_copy
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
 
     if public_resources.is_image_operation_window_open:
         return

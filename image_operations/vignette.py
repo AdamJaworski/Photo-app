@@ -5,10 +5,9 @@ import numpy
 import cv2
 
 
-#test
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.image_cv2
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
 
     def __on_close():
         settings_window.destroy()
@@ -16,7 +15,7 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_cancel():
-        public_resources.current_image_class.image_cv2 = image_copy
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
         __on_close()
 
     @public_resources.refresh_viewport
@@ -30,7 +29,7 @@ def start_gui():
             vignette = np.empty_like(image_copy)
             for i in range(3):
                 vignette[:, :, i] = (image_copy[:, :, i] * mask).astype(np.uint8)
-            public_resources.current_image_class.image_cv2 = vignette
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = vignette
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -45,7 +44,7 @@ def start_gui():
         if preview.get():
             __on_value_change()
         else:
-            public_resources.current_image_class.image_cv2 = image_copy
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
 
     settings_window = customtkinter.CTkToplevel()
     settings_window.geometry(f"320x180+{public_resources.screen_width-340}+10")

@@ -7,8 +7,8 @@ import numpy
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.image_cv2
-    image_copy_hsv = cv2.cvtColor(public_resources.current_image_class.image_cv2, cv2.COLOR_BGR2HSV)
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
+    image_copy_hsv = cv2.cvtColor(public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0], cv2.COLOR_BGR2HSV)
 
     def __on_close():
         settings_window.destroy()
@@ -16,7 +16,7 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_cancel():
-        public_resources.current_image_class.image_cv2 = image_copy
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
         __on_close()
 
     @public_resources.refresh_viewport
@@ -28,8 +28,9 @@ def start_gui():
             v = numpy.clip(numpy.multiply(v.astype(numpy.float32), slider_v.get()).astype(numpy.uint8), 0, 255)
             output_hvs = cv2.merge([h, s, v])
             output_cv2 = cv2.cvtColor(output_hvs, cv2.COLOR_HSV2BGR)
-            public_resources.current_image_class.image_cv2 = output_cv2
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2
 
+    public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
     @public_resources.refresh_viewport
     @public_resources.save_state
     def __on_apply():
@@ -43,7 +44,7 @@ def start_gui():
         if preview.get():
             __on_value_change()
         else:
-            public_resources.current_image_class.image_cv2 = image_copy
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
 
     settings_window = customtkinter.CTkToplevel()
     settings_window.geometry(f"320x180+{public_resources.screen_width-340}+10")

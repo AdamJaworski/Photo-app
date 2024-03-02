@@ -18,10 +18,10 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_recover(operation_log: HistoryLog.HistoryLog):
-        public_resources.current_image_class.image_cv2 = operation_log.image
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = operation_log.image
         if operation_log.operation_name == "Resize":
-            public_resources.current_image_class.default_image_size = (public_resources.current_image_class.image_cv2.shape[1],
-                                                                       public_resources.current_image_class.image_cv2.shape[0])
+            public_resources.current_image_class.default_image_size = (public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].shape[1],
+                                                                       public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].shape[0])
         operation_log = None
 
     def __on_new_log(__history_log):

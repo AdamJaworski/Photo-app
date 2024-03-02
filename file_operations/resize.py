@@ -15,9 +15,8 @@ def start_gui():
     @public_resources.save_state
     def __on_apply():
         public_resources.current_image_class.default_image_size = (int(width.get()), int(height.get()))
-        public_resources.current_image_class.image_cv2 = cv2.resize(public_resources.current_image_class.image_cv2,
-                                                                    public_resources.current_image_class.default_image_size,
-                                                                    interpolation=resize_methode_)
+        for layer in public_resources.current_image_class.layers:
+            layer[0] = cv2.resize(layer[0], public_resources.current_image_class.default_image_size, interpolation=resize_methode_)
         __on_close()
         return "Resize"
 

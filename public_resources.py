@@ -19,6 +19,7 @@ current_width_multiplier = 1
 screen_width = 0
 screen_height = 0
 image_history_limit = 20
+is_layer_window_open           = False
 is_image_operation_window_open = False
 is_image_history_window_open   = False
 is_save_image_window_open      = False
@@ -26,11 +27,13 @@ app_threads = []
 # close_image_history_window = empty_function
 # Public functions
 force_history_refresh = empty_function
+force_layers_refresh  = empty_function
 on_new_history_log    = empty_function
 on_image_load         = empty_function
 image_buttons_refresh = empty_function
 do_viewport_update    = empty_function
 close_image_history   = empty_function
+close_layers          = empty_function
 
 
 def image_operation(func):

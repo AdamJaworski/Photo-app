@@ -8,7 +8,7 @@ from functools import partial
 import cv2
 import os
 
-from file_operations import open_image, resize, save_image, settings
+from file_operations import open_image, resize, save_image, settings, layers
 from image_operations import blur, hsv, canny, rgb, brightness_contrast_old, brightness_contrast, vignette
 import public_resources
 import image_history
@@ -46,6 +46,7 @@ def __set_image_active(image_: ImageClass):
             public_resources.current_image_class = image_
             __update_image(image_)
             public_resources.force_history_refresh()
+            public_resources.force_layers_refresh()
     image_ = None
 
 
@@ -99,6 +100,7 @@ def close():
         global current_image_label
         public_resources.current_image_class = None
         public_resources.close_image_history()
+        public_resources.close_layers()
         current_image_label.configure(image=None)
 
     __refresh_image_buttons()
@@ -168,6 +170,8 @@ def image_menu(choice):
             resize.start_gui()
         case "History":
             image_history.start_gui()
+        case "Layers":
+            layers.start_gui()
         case _:
             raise UserWarning("Not implemented choice")
 
@@ -206,7 +210,7 @@ file = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Open", "Save", "
 file.set("File")
 file.pack(side="left")
 
-image = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Resize", "History"], command=image_menu, hover=True)
+image = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Resize", "History", "Layers"], command=image_menu, hover=True)
 image.set("Image")
 image.pack(side="left")
 

@@ -88,8 +88,12 @@ class ImageClass:
         for layer in self.layers[1:]:
             if not layer[1]:
                 continue
-            overlay_image = Image.fromarray(cv2.cvtColor(self.layers[0], cv2.COLOR_BGR2RGB))
-            base_image.paste(overlay_image, (0,0), overlay_image)
+            overlay_image = Image.fromarray(cv2.cvtColor(layer[0], cv2.COLOR_BGR2RGB))
+            if overlay_image.mode == 'RGBA':
+                r, g, b, alpha = overlay_image.split()
+                base_image.paste(overlay_image, (0, 0), alpha)
+            else:
+                base_image.paste(overlay_image, (0, 0))
         return base_image
 
     def update_display_size(self):

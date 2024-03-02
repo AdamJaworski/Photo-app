@@ -8,6 +8,7 @@ from os.path import isfile
 extension = ".jpg"
 
 
+# testing
 @public_resources.image_operation
 def start_gui():
     global extension

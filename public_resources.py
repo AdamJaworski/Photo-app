@@ -1,3 +1,4 @@
+import gc
 import threading
 from PIL.Image import BICUBIC
 from HistoryLog import HistoryLog
@@ -48,6 +49,8 @@ def refresh_viewport(func):
         update_thread = threading.Thread(target=do_viewport_update, args=(current_image_class,))
         func(*args)
         if update_viewport_on_new_thread:
+            if threading.active_count() > 6:
+                return
             update_thread.start()
         else:
             do_viewport_update(current_image_class)
@@ -60,6 +63,7 @@ def save_state(func):
         new_log = HistoryLog(current_image_class.layers[current_image_class.active_layer][0], operation_name, current_image_class.layers[current_image_class.active_layer][1])
         current_image_class.image_operations_history.append(new_log)
         on_new_history_log(new_log)
+        gc.collect()
     return wrapper
 
 

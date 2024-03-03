@@ -18,11 +18,10 @@ def start_gui():
 
     @public_resources.refresh_viewport
     def __on_value_change(event=None):
-        if not preview.get():
-            return
-        output = cv2.Canny(image_copy, threshold1.get(), threshold2.get())
-        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = cv2.cvtColor(output, cv2.COLOR_GRAY2BGR)
-        output = None
+        if preview.get():
+            output_cv2 = cv2.addWeighted(image_copy, alpha.get(), public_resources.current_image_class.layers[0][0], beta.get(), 0)
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2
+            del output_cv2
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -30,7 +29,7 @@ def start_gui():
         preview.select(1)
         __on_value_change()
         __on_close()
-        return "Canny"
+        return "Blend layers"
 
     @public_resources.refresh_viewport
     def __on_preview_change():
@@ -41,14 +40,16 @@ def start_gui():
 
     settings_window = customtkinter.CTkToplevel()
     settings_window.geometry(f"320x180+{public_resources.screen_width-340}+10")
-    settings_window.title("Canny")
+    settings_window.title("Brightness/Contrast")
     settings_window.attributes('-topmost', True)
     settings_window.protocol("WM_DELETE_WINDOW", __on_cancel)
 
-    threshold1 = customtkinter.CTkSlider(settings_window, width=350, height=20, from_=0, to=255, command=__on_value_change)
-    threshold2 = customtkinter.CTkSlider(settings_window, width=350, height=20, from_=0, to=255, command=__on_value_change)
-    threshold1.pack()
-    threshold2.pack()
+    alpha = customtkinter.CTkSlider(settings_window, width=350, height=20, from_=0, to=1, command=__on_value_change, number_of_steps=1000)
+    beta  = customtkinter.CTkSlider(settings_window, width=350, height=20, from_=0, to=1, command=__on_value_change, number_of_steps=1000)
+    alpha.set(1)
+    beta.set(2)
+    alpha.pack()
+    beta.pack()
 
     customtkinter.CTkButton(settings_window, text="Apply",  command=__on_apply).pack()
     customtkinter.CTkButton(settings_window, text="Cancel", command=__on_cancel).pack()

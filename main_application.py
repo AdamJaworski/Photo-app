@@ -8,6 +8,7 @@ from functools import partial
 import cv2
 import os
 
+from experimental import blend_layers, blend_layers_v2
 from file_operations import open_image, resize, save_image, settings, layers
 from image_operations import blur, hsv, canny, rgb, brightness_contrast_old, brightness_contrast, vignette
 import public_resources
@@ -112,7 +113,7 @@ def save():
     if public_resources.current_image_class.last_save is None:
         save_image.start_gui()
     else:
-        cv2.imwrite(public_resources.current_image_class.last_save, public_resources.current_image_class.image_cv2)
+        cv2.imwrite(public_resources.current_image_class.last_save, public_resources.current_image_class.get_save_image_cv2())
 
 
 def transform_menu(choice):
@@ -159,6 +160,17 @@ def file_menu(choice):
             settings.start_gui()
         case "Debug":
             check()
+        case _:
+            raise UserWarning("Not implemented choice")
+
+
+def new_menu(choice):
+    image.set("New")
+    match choice:
+        case "Blend layers":
+            blend_layers.start_gui()
+        case "Blend layers v2":
+            blend_layers_v2.start_gui()
         case _:
             raise UserWarning("Not implemented choice")
 
@@ -221,6 +233,10 @@ transform.pack(side="right")
 color = customtkinter.CTkOptionMenu(main_buttons_frame, values=["HSV", "RGB", "Brightness/Contrast", "Brightness/Contrast OLD"], command=color_menu, hover=True)
 color.set("Color")
 color.pack(side="right")
+
+new = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Blend layers", "Blend layers v2"], command=new_menu, hover=True)
+new.set("New")
+new.pack(side="right")
 
 #
 button_frame = customtkinter.CTkFrame(app, height=32)

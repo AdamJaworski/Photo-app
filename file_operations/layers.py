@@ -73,7 +73,7 @@ def start_gui():
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][1] = None
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer] = None
         public_resources.current_image_class.layers.remove(public_resources.current_image_class.layers[public_resources.current_image_class.active_layer])
-        public_resources.current_image_class.active_layer = 0
+        public_resources.current_image_class.active_layer = len(public_resources.current_image_class.layers) - 1
         __force_layer_refresh()
         gc.collect()
 

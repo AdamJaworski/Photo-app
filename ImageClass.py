@@ -33,7 +33,7 @@ class ImageClass:
         self.image_operations_history = [HistoryLog(self.layers[self.active_layer][0], "Open", self.active_layer)]
         self.last_save = None
         self.save_name = None
-        threading.Thread(target=self.benchmark_methode).start()
+        self.use_cv2_display_methode = True
 
     def benchmark_methode(self):
         self.use_cv2_display_methode = True

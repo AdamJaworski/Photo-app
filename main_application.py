@@ -73,7 +73,7 @@ def __clear_memory_on_close():
         log.image = None
         log.operation_name = None
     self = public_resources.current_image_class
-    self.image_cv2 = None
+    self.layers = None
     self.image_cv2_on_load = None
     self.image_ratio = None
     self.image_ratio_ = None

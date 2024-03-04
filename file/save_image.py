@@ -2,7 +2,7 @@ import threading
 import cv2
 import customtkinter
 import tkinter
-import public_resources
+from structures import public_resources
 from tkinter import filedialog
 from os.path import isfile
 extension = ".jpg"

@@ -1,6 +1,19 @@
+import threading
+import time
 import customtkinter
-import public_resources
+from structures import public_resources
 import numpy
+from numba import njit
+
+last_call = 0
+
+
+@njit(fastmath=True, parallel=True)
+def change_image_contrast_and_brightness(image, contrast: float, brightness: float):
+    image = numpy.power(image, contrast)
+    image = numpy.add(image, brightness)
+    image = numpy.clip(image, 0, 255)
+    return image
 
 
 @public_resources.image_operation
@@ -16,15 +29,20 @@ def start_gui():
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
         __on_close()
 
-    @public_resources.refresh_viewport
     def __on_value_change(event=None):
-        if preview.get():
-            contrast_ = contrast.get()/2
-            output_cv2 = image_copy.astype(numpy.float32)
-            output_cv2 = numpy.power(output_cv2, contrast_)
-            output_cv2 = numpy.add(output_cv2, brightness.get())
-            output_cv2 = numpy.clip(output_cv2, 0, 255)
-            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2.astype(numpy.uint8)
+        global last_call
+        if not preview.get():
+            return
+        if time.time() - last_call >= 0.1:
+            threading.Thread(target=__update_image).start()
+            last_call = time.time()
+
+    @public_resources.refresh_viewport
+    def __update_image():
+        contrast_ = contrast.get() / 2
+        brightness_ = brightness.get()
+        public_resources.current_image_class.layers[
+            public_resources.current_image_class.active_layer][0] = change_image_contrast_and_brightness(image_copy, contrast_, brightness_).astype(numpy.uint8)
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -42,7 +60,7 @@ def start_gui():
             public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = image_copy
 
     settings_window = customtkinter.CTkToplevel()
-    settings_window.geometry(f"320x180+{public_resources.screen_width-340}+10")
+    settings_window.geometry(f"320x180+{public_resources.screen_width - 340}+10")
     settings_window.title("Brightness/Contrast")
     settings_window.attributes('-topmost', True)
     settings_window.protocol("WM_DELETE_WINDOW", __on_cancel)
@@ -62,3 +80,4 @@ def start_gui():
     preview.pack()
     __on_value_change()
     public_resources.is_image_operation_window_open = True
+

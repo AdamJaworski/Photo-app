@@ -1,8 +1,10 @@
 import gc
 import threading
+import os
+import psutil
 from PIL.Image import BICUBIC
-from HistoryLog import HistoryLog
-from ImageClass import ImageClass
+from .HistoryLog import HistoryLog
+from .ImageClass import ImageClass
 import time
 
 
@@ -49,7 +51,7 @@ def refresh_viewport(func):
         update_thread = threading.Thread(target=do_viewport_update, args=(current_image_class,))
         func(*args)
         if update_viewport_on_new_thread:
-            if threading.active_count() > 6:
+            if threading.active_count() > 8:
                 return
             update_thread.start()
         else:
@@ -70,7 +72,20 @@ def save_state(func):
 def measure_time(func):
     def wrapper(*args):
         start = time.time()
-        func(*args)
+        output = func(*args)
         end = time.time()
         print(end - start)
+        return output
     return wrapper
+
+
+def ram_test(func, name: str, delay: float = 0.05):
+    start_ram = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+    print(f"Starting test for {name}...")
+    for i in range(500):
+        if int(i/100) == i/100:
+            print(f"Finished {i}/500 refreshes current ram usage: {psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2:.2f} MB")
+        func()
+        time.sleep(delay)
+    end_ram = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+    print(f"Start {start_ram:.2f} MB, End {end_ram:.2f} MB")

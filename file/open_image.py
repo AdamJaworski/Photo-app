@@ -1,7 +1,7 @@
 import cv2
 import customtkinter
 import tkinter
-import public_resources
+from structures import public_resources
 from tkinter import filedialog
 
 
@@ -20,8 +20,10 @@ def start_gui():
         url_var.set(filedialog.askopenfilename())
 
     def __open():
-        open_ = cv2.imread(url_var.get())
+        open_ = cv2.imread(url_var.get(), cv2.IMREAD_UNCHANGED)
         if open_ is not None:
+            if open_.shape[2] == 3:
+                open_ = cv2.cvtColor(open_, cv2.COLOR_BGR2BGRA)
             public_resources.on_image_load(open_)
             __on_close()
         del open_

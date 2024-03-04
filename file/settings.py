@@ -1,8 +1,7 @@
 import PIL.Image
-import cv2
 import customtkinter
 import tkinter
-import public_resources
+from structures import public_resources
 
 is_app_open = False
 local_rescale_methode: PIL.Image

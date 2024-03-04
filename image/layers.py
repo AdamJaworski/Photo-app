@@ -1,14 +1,12 @@
 import gc
 import customtkinter
-import HistoryLog
-import public_resources
+from structures import public_resources
 
 button_list = []
 vis_button_list = []
 frames = []
 
 
-@public_resources.image_operation
 def start_gui():
     global button_list
     global vis_button_list
@@ -40,9 +38,8 @@ def start_gui():
         global button_list
         global vis_button_list
         global frames
-        if layer_index == 0:
-            return
         public_resources.current_image_class.layers[layer_index][1] = not public_resources.current_image_class.layers[layer_index][1]
+        public_resources.current_image_class.vis[layer_index] = not public_resources.current_image_class.vis[layer_index]
         if public_resources.current_image_class.layers[layer_index][1]:
             button_list[layer_index].configure(fg_color=default_color)
             vis_button_list[layer_index].configure(fg_color=default_color)
@@ -52,6 +49,8 @@ def start_gui():
         button_list[public_resources.current_image_class.active_layer].configure(fg_color="grey")
 
     def __on_layer_change(layer_index: int):
+        if public_resources.is_image_operation_window_open:
+            return
         global button_list
         global vis_button_list
         global frames
@@ -59,8 +58,8 @@ def start_gui():
         public_resources.current_image_class.active_layer = layer_index
 
         button_list[public_resources.current_image_class.active_layer].configure(fg_color="grey")
-        if previous_index <= len(public_resources.current_image_class.layers) - 1:
-            button_list[previous_index].configure(fg_color=default_color) if public_resources.current_image_class.layers[previous_index][1] else button_list[previous_index].configure(fg_color=no_vis_fg_color)
+        if previous_index <= len(public_resources.current_image_class.images) - 1:
+            button_list[previous_index].configure(fg_color=default_color) if public_resources.current_image_class.vis[previous_index] else button_list[previous_index].configure(fg_color=no_vis_fg_color)
 
     @public_resources.refresh_viewport
     def __delete_layer():
@@ -72,7 +71,14 @@ def start_gui():
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = None
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][1] = None
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer] = None
-        public_resources.current_image_class.layers.remove(public_resources.current_image_class.layers[public_resources.current_image_class.active_layer])
+        public_resources.current_image_class.layers.remove(None)
+
+        public_resources.current_image_class.vis[public_resources.current_image_class.active_layer] = None
+        public_resources.current_image_class.vis.remove(None)
+
+        public_resources.current_image_class.images = []
+        public_resources.current_image_class.images = [layer_[0] for layer_ in public_resources.current_image_class.layers]
+
         public_resources.current_image_class.active_layer = len(public_resources.current_image_class.layers) - 1
         __force_layer_refresh()
         gc.collect()
@@ -120,7 +126,7 @@ def start_gui():
 
     public_resources.force_layer_refresh = __force_layer_refresh
     settings_window = customtkinter.CTkToplevel()
-    settings_window.geometry(f"320x280+{public_resources.screen_width-400}+{public_resources.screen_height-540}")
+    settings_window.geometry(f"320x280+{public_resources.screen_width - 400}+{public_resources.screen_height - 540}")
     settings_window.title("Layers")
     settings_window.attributes('-topmost', True)
     settings_window.protocol("WM_DELETE_WINDOW", __on_close)

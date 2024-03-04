@@ -1,6 +1,6 @@
 import customtkinter
 import cv2
-import public_resources
+from structures import public_resources
 
 
 @public_resources.image_operation
@@ -20,9 +20,10 @@ def start_gui():
     def __on_value_change(event=None):
         if not preview.get():
             return
-        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = cv2.bilateralFilter(image_copy, int(slider_d.get()),
-                                                                                                                                slider_strength.get(),
-                                                                                                                                slider_strength.get())
+        public_resources.current_image_class.layers[
+            public_resources.current_image_class.active_layer][0] = cv2.bilateralFilter(image_copy, int(slider_d.get()),
+                                                                                        slider_strength.get(),
+                                                                                        slider_strength.get())
 
     @public_resources.refresh_viewport
     @public_resources.save_state
@@ -43,7 +44,7 @@ def start_gui():
         return
 
     settings_window = customtkinter.CTkToplevel()
-    settings_window.geometry(f"320x180+{public_resources.screen_width-340}+10")
+    settings_window.geometry(f"320x180+{public_resources.screen_width - 340}+10")
     settings_window.title("Blur")
     settings_window.attributes('-topmost', True)
     settings_window.protocol("WM_DELETE_WINDOW", __on_cancel)

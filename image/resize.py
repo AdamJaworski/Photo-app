@@ -3,7 +3,7 @@ import time
 import cv2
 import customtkinter
 import tkinter
-import public_resources
+from structures import public_resources
 
 
 @public_resources.image_operation

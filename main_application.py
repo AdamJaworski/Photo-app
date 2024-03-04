@@ -1,5 +1,6 @@
 import gc
 import sys
+import warnings
 import psutil
 from PIL import ImageTk
 import customtkinter
@@ -8,12 +9,13 @@ from functools import partial
 import cv2
 import os
 
-from experimental import blend_layers, blend_layers_v2
-from file_operations import open_image, resize, save_image, settings, layers
-from image_operations import blur, hsv, canny, rgb, brightness_contrast_old, brightness_contrast, vignette
-import public_resources
-import image_history
-from ImageClass import ImageClass
+from experimental import blend_layers, cut
+from file import open_image, save_image, settings
+from transform import canny, vignette, blur
+from color import hsv, rgb, brightness_contrast, brightness_contrast_old
+from structures import public_resources
+from image import image_history, layers, resize
+from structures.ImageClass import ImageClass
 
 
 def __on_exit():
@@ -54,7 +56,8 @@ def __set_image_active(image_: ImageClass):
 def __update_image(image_: ImageClass):
     if image_ is None:
         return
-    current_image_label.configure(image=ImageTk.PhotoImage(image_.get_display_image()))
+    image_.get_display_image()
+    current_image_label.configure(image=(ImageTk.PhotoImage(image_.image_PIL) if image_.image_PIL is not None else image_.image_PIL))
 
 
 def __refresh_image_buttons():
@@ -160,6 +163,9 @@ def file_menu(choice):
             settings.start_gui()
         case "Debug":
             check()
+        case "Test":
+            pass
+            #ram_test()
         case _:
             raise UserWarning("Not implemented choice")
 
@@ -169,8 +175,8 @@ def new_menu(choice):
     match choice:
         case "Blend layers":
             blend_layers.start_gui()
-        case "Blend layers v2":
-            blend_layers_v2.start_gui()
+        case "Cut":
+            cut.start_gui()
         case _:
             raise UserWarning("Not implemented choice")
 
@@ -218,7 +224,7 @@ main_buttons_frame = customtkinter.CTkFrame(app, height=128)
 main_buttons_frame.pack(fill='x')
 
 
-file = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Open", "Save", "Save as..", "Close","Settings", "Debug"], command=file_menu, hover=True)
+file = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Open", "Save", "Save as..", "Close","Settings", "Debug", "Test"], command=file_menu, hover=True)
 file.set("File")
 file.pack(side="left")
 
@@ -234,7 +240,7 @@ color = customtkinter.CTkOptionMenu(main_buttons_frame, values=["HSV", "RGB", "B
 color.set("Color")
 color.pack(side="right")
 
-new = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Blend layers", "Blend layers v2"], command=new_menu, hover=True)
+new = customtkinter.CTkOptionMenu(main_buttons_frame, values=["Blend layers", "Cut"], command=new_menu, hover=True)
 new.set("New")
 new.pack(side="right")
 
@@ -252,8 +258,9 @@ public_resources.on_image_load = __on_image_load
 public_resources.image_buttons_refresh = __refresh_image_buttons
 public_resources.screen_width = app.winfo_screenwidth()
 public_resources.screen_height = app.winfo_screenheight()
-center_x = int(public_resources.screen_width/2  - 920 / 2)
-center_y = int(public_resources.screen_height/2 - 680 / 2)
+center_x = int(public_resources.screen_width / 2 - 920 / 2)
+center_y = int(public_resources.screen_height / 2 - 680 / 2)
 app.geometry(f"920x680+{center_x}+{center_y}")
+warnings.filterwarnings("ignore", message="CTkLabel Warning: Given image is not CTkImage but .* Image can not be scaled on HighDPI displays, use CTkImage instead.")
 app.mainloop()
 

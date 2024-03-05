@@ -4,6 +4,7 @@ import cv2
 import customtkinter
 import tkinter
 from structures import public_resources
+import numpy as np
 
 
 @public_resources.image_operation
@@ -12,13 +13,16 @@ def start_gui():
         settings_window.destroy()
         public_resources.is_image_operation_window_open = False
 
-    @public_resources.save_state
+    @public_resources.refresh_viewport
     def __on_apply():
         public_resources.current_image_class.default_image_size = (int(width.get()), int(height.get()))
+        public_resources.current_image_class.dummy_alpha = np.full(fill_value=255, shape=(public_resources.current_image_class.default_image_size[1], public_resources.current_image_class.default_image_size[0])).astype('float32')
+
         for layer in public_resources.current_image_class.layers:
             layer[0] = cv2.resize(layer[0], public_resources.current_image_class.default_image_size, interpolation=resize_methode_)
+            layer[0][:, :, 3] = np.clip(np.round(layer[0][:, :, 3]), 0, 255)
+        public_resources.current_image_class.image_cv2_on_load = cv2.resize(public_resources.current_image_class.image_cv2_on_load, public_resources.current_image_class.default_image_size, interpolation=resize_methode_)
         __on_close()
-        return "Resize"
 
     def __watchdog():
         current_width = int(width.get())

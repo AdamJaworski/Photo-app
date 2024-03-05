@@ -2,13 +2,14 @@ import customtkinter
 import cv2
 from structures import public_resources
 import numpy
+b, g, r, a = None, None, None, None
 
 
 @public_resources.image_operation
 def start_gui():
+    global b, g, r, a
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
-    image_copy_rgb = cv2.cvtColor(
-        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0], cv2.COLOR_BGRA2RGBA)
+    (b, g, r, a) = cv2.split(image_copy)
 
     def __on_close():
         settings_window.destroy()
@@ -20,20 +21,19 @@ def start_gui():
         __on_close()
 
     @public_resources.refresh_viewport
+    # Works faster on single thread render
     def __on_value_change(event=None):
+        global b, g, r, a
         if preview.get():
-            (r, g, b, a) = cv2.split(image_copy_rgb)
             if multiply.get():
-                r = numpy.clip(numpy.multiply(r.astype(numpy.float32), slider_r.get()).astype("uint8"), 0, 255)
-                g = numpy.clip(numpy.multiply(g.astype(numpy.float32), slider_g.get()).astype("uint8"), 0, 255)
-                b = numpy.clip(numpy.multiply(b.astype(numpy.float32), slider_b.get()).astype("uint8"), 0, 255)
+                r_ = numpy.multiply(r, slider_r.get())
+                g_ = numpy.multiply(g, slider_g.get())
+                b_ = numpy.multiply(b, slider_b.get())
             else:
-                r = numpy.clip(numpy.add(r.astype(numpy.float32), (slider_r.get() - 1)*15).astype("uint8"), 0, 255)
-                g = numpy.clip(numpy.add(g.astype(numpy.float32), (slider_g.get() - 1)*15).astype("uint8"), 0, 255)
-                b = numpy.clip(numpy.add(b.astype(numpy.float32), (slider_b.get() - 1)*15).astype("uint8"), 0, 255)
-            output_rgb = cv2.merge([r, g, b, a])
-            output_cv2 = cv2.cvtColor(output_rgb, cv2.COLOR_RGBA2BGRA)
-            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2
+                r_ = numpy.add(r, slider_r.get())
+                g_ = numpy.add(g, slider_g.get())
+                b_ = numpy.add(b, slider_b.get())
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = cv2.merge([b_, g_, r_, a])
 
     @public_resources.refresh_viewport
     @public_resources.save_state

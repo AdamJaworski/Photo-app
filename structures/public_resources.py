@@ -62,7 +62,7 @@ def refresh_viewport(func):
 def save_state(func):
     def wrapper():
         operation_name = func()
-        new_log = HistoryLog(current_image_class.layers[current_image_class.active_layer][0], operation_name, current_image_class.layers[current_image_class.active_layer][1])
+        new_log = HistoryLog(current_image_class.layers[current_image_class.active_layer][0], operation_name)
         current_image_class.image_operations_history.append(new_log)
         on_new_history_log(new_log)
         gc.collect()
@@ -73,8 +73,7 @@ def measure_time(func):
     def wrapper(*args):
         start = time.time()
         output = func(*args)
-        end = time.time()
-        print(end - start)
+        print(f"{(time.time() - start).__round__(4)}s")
         return output
     return wrapper
 

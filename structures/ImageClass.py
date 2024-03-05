@@ -1,28 +1,32 @@
+import numpy as np
 from PIL import Image
 import cv2
 from . import public_resources
 from .HistoryLog import HistoryLog
 import time
-from numba import njit, prange
 import numpy
+from numba import jit, prange
+from external_c.pyd import process_image
 
 
-@njit(fastmath=True)
-def get_save_image_cv2(images, vis, base_image, index_):
-    alpha_divisor = 255.0  # Move constant division out of the loop
-    # Blending the images
-    for index in prange(index_ + 1, len(images)):  # Start from the next image
-        if not vis[index]:
+def blend_images(dummy_alpha, layers, base_image):
+    output = np.copy(base_image)
+    for (image, visibility) in layers:
+        if not visibility:
             continue
-        overlay_image = images[index]
-        alpha_mask = overlay_image[:, :, 3] / alpha_divisor
-        overlay = overlay_image[:, :, :3]
-        background_mask = 1.0 - alpha_mask
-        # Blend images
-        for c in range(3):
-            base_image[:, :, c] = (alpha_mask * overlay[:, :, c] + background_mask * base_image[:, :, c])
 
-    return base_image
+        alpha = output[:, :, 3]
+        if (alpha == dummy_alpha).all():
+            return output.astype('uint8')
+
+        alpha = alpha.astype('float32') / 255.0
+        alpha = cv2.merge([alpha, alpha, alpha, alpha])
+
+        output *= alpha
+        image  *= 1.0 - alpha
+        output += image
+
+    return numpy.clip(output, 0, 255).astype('uint8')
 
 
 class ImageClass:
@@ -40,24 +44,22 @@ class ImageClass:
         self.image_ratio_ = image_cv2.shape[1] / image_cv2.shape[0]   # width / height
         self.display_image_size = (0, 0)
         self.default_image_size = (image_cv2.shape[1], image_cv2.shape[0])
+        self.dummy_alpha = np.full(fill_value=255, shape=(self.default_image_size[1], self.default_image_size[0])).astype('float32')
         self.update_display_size()
-        self.layers = [[image_cv2, True]]
+        self.layers = [[image_cv2.astype('float32'), True]]
         self.active_layer = 0
         """"index of an active layer"""
-        self.image_operations_history = [HistoryLog(self.layers[self.active_layer][0], "Open", self.active_layer)]
-        self.images = [layer[0] for layer in self.layers]
+        self.image_operations_history = [HistoryLog(self.layers[self.active_layer][0], "Open")]
         self.vis = [True]
         self.last_save = None
         self.save_name = None
-        self.use_cv2_display_methode = False
-
-    def benchmark_methode(self):
         self.use_cv2_display_methode = True
 
+    def benchmark_methode(self):
         time_for_cv2 = 0
         for i in range(10):
             start = time.time()
-            self.get_display_image_cv2(self.images[0], 0)
+            self.get_display_image_cv2(0)
             end = time.time()
             time_for_cv2 += (end - start)
         time_for_cv2 = time_for_cv2 / 10
@@ -65,7 +67,7 @@ class ImageClass:
         time_for_pillow = 0
         for i in range(10):
             start = time.time()
-            self.get_display_image_pillow(self.images[0], 0)
+            self.get_display_image_pillow(0)
             end = time.time()
             time_for_pillow += (end - start)
         time_for_pillow = time_for_pillow / 10
@@ -74,27 +76,38 @@ class ImageClass:
         self.use_cv2_display_methode = False if time_for_pillow < time_for_cv2 else True
 
     def get_display_image(self) -> Image:
-        for index, vis_ in enumerate(self.vis):
+
+        for index, vis_ in enumerate(reversed(self.vis)):
             if vis_:
                 break
+        index = len(self.vis) - index - 1
         if not self.vis[index]:
             self.image_PIL = None
             return self.image_PIL
-        # TODO pillow methode works great but doesn't display alpha mask
-        # TODO cv2 just shows the base image - doesn't work at all
-        if self.use_cv2_display_methode:
-            self.image_PIL = self.get_display_image_cv2(self.images[index], index)
-        else:
-            self.image_PIL = self.get_display_image_pillow(self.images[index], index)
 
+        # TODO pillow methode works great but doesn't display alpha mask
+        if self.use_cv2_display_methode:
+            self.image_PIL = self.get_display_image_cv2(index)
+        else:
+            self.image_PIL = self.get_display_image_pillow(index)
+        start = time.time()
         self.image_PIL = self.image_PIL.resize(self.display_image_size, public_resources.display_rescale_methode)
+        print(time.time() - start)
         return self.image_PIL
 
-    def get_display_image_cv2(self, base_image, index):
-        return Image.fromarray(cv2.cvtColor(numpy.array(get_save_image_cv2(self.images, self.vis, base_image, index), dtype=numpy.uint8), cv2.COLOR_BGRA2RGBA))
+    def get_display_image_cv2(self, index):
+        numba_list = self.layers[:index]
+        numba_list.reverse()
 
-    def get_display_image_pillow(self, base_image, index):
-        base_image = Image.fromarray(cv2.cvtColor(base_image, cv2.COLOR_BGRA2RGBA))
+        if len(numba_list) > 0:
+            output = process_image.blend_images(self.dummy_alpha, numba_list, self.layers[index][0])
+        else:
+            output = self.layers[index][0].astype('uint8')
+
+        return Image.fromarray(cv2.cvtColor(output, cv2.COLOR_BGRA2RGBA))
+
+    def get_display_image_pillow(self, index):
+        base_image = Image.fromarray(cv2.cvtColor(self.layers[index][0], cv2.COLOR_BGRA2RGBA))
         for layer in self.layers[index:]:
             if not layer[1]:
                 continue
@@ -108,8 +121,7 @@ class ImageClass:
                                    int(public_resources.current_width_multiplier * public_resources.default_image_width * self.image_ratio))
 
     def create_new_layer(self) -> int:
-        self.layers.append([self.image_cv2_on_load, True])
-        self.images = [layer[0] for layer in self.layers]
+        self.layers.append([self.image_cv2_on_load.astype('float32'), True])
         self.vis.append(True)
         return len(self.layers) - 1
 

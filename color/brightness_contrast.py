@@ -4,6 +4,7 @@ import customtkinter
 from structures import public_resources
 import numpy
 from numba import njit
+from external_c.pyd import brightness_contrast
 
 last_call = 0
 
@@ -12,7 +13,6 @@ last_call = 0
 def change_image_contrast_and_brightness(image, contrast: float, brightness: float):
     image = numpy.power(image, contrast)
     image = numpy.add(image, brightness)
-    image = numpy.clip(image, 0, 255)
     return image
 
 
@@ -33,16 +33,17 @@ def start_gui():
         global last_call
         if not preview.get():
             return
-        if time.time() - last_call >= 0.1:
+        if time.time() - last_call >= 0.06:
             threading.Thread(target=__update_image).start()
             last_call = time.time()
 
     @public_resources.refresh_viewport
+    # Works faster on multithread render
     def __update_image():
         contrast_ = contrast.get() / 2
         brightness_ = brightness.get()
         public_resources.current_image_class.layers[
-            public_resources.current_image_class.active_layer][0] = change_image_contrast_and_brightness(image_copy, contrast_, brightness_).astype(numpy.uint8)
+            public_resources.current_image_class.active_layer][0] = change_image_contrast_and_brightness(image_copy, contrast_, brightness_)
 
     @public_resources.refresh_viewport
     @public_resources.save_state

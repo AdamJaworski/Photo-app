@@ -51,6 +51,8 @@ def start_gui():
     def __on_layer_change(layer_index: int):
         if public_resources.is_image_operation_window_open:
             return
+        if layer_index == public_resources.current_image_class.active_layer:
+            return
         global button_list
         global vis_button_list
         global frames
@@ -58,7 +60,7 @@ def start_gui():
         public_resources.current_image_class.active_layer = layer_index
 
         button_list[public_resources.current_image_class.active_layer].configure(fg_color="grey")
-        if previous_index <= len(public_resources.current_image_class.images) - 1:
+        if previous_index <= len(public_resources.current_image_class.layers) - 1:
             button_list[previous_index].configure(fg_color=default_color) if public_resources.current_image_class.vis[previous_index] else button_list[previous_index].configure(fg_color=no_vis_fg_color)
 
     @public_resources.refresh_viewport
@@ -75,9 +77,6 @@ def start_gui():
 
         public_resources.current_image_class.vis[public_resources.current_image_class.active_layer] = None
         public_resources.current_image_class.vis.remove(None)
-
-        public_resources.current_image_class.images = []
-        public_resources.current_image_class.images = [layer_[0] for layer_ in public_resources.current_image_class.layers]
 
         public_resources.current_image_class.active_layer = len(public_resources.current_image_class.layers) - 1
         __force_layer_refresh()

@@ -171,7 +171,7 @@ def file_menu(choice):
 
 
 def new_menu(choice):
-    image.set("New")
+    new.set("New")
     match choice:
         case "Blend layers":
             blend_layers.start_gui()

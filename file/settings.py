@@ -54,6 +54,8 @@ def start_gui():
                 local_rescale_methode = PIL.Image.BOX
             case "HAMMING":
                 local_rescale_methode = PIL.Image.HAMMING
+            case "":
+                local_rescale_methode = PIL.Image.RES
             case _:
                 raise UserWarning
 

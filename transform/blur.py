@@ -5,7 +5,9 @@ from structures import public_resources
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].astype('uint8')
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
+    image_copy_ = image_copy.astype('uint8')
+    alpha = image_copy_[:, :, 3]
 
     def __on_close():
         settings_window.destroy()
@@ -20,10 +22,9 @@ def start_gui():
     def __on_value_change(event=None):
         if not preview.get():
             return
-        public_resources.current_image_class.layers[
-            public_resources.current_image_class.active_layer][0] = cv2.bilateralFilter(image_copy, int(slider_d.get()),
-                                                                                        slider_strength.get(),
-                                                                                        slider_strength.get())
+        output_cv2 = cv2.bilateralFilter(cv2.cvtColor(image_copy_, cv2.COLOR_RGBA2RGB), int(slider_d.get()), slider_strength.get(), slider_strength.get())
+        output_cv2 = cv2.merge((*cv2.split(output_cv2), alpha))
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2
 
     @public_resources.refresh_viewport
     @public_resources.save_state

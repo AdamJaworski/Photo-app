@@ -74,9 +74,9 @@ class ImageClass:
         if not self.vis[index]:
             return self.image_PIL
 
-        self.image_PIL = self.get_display_image_cv2(index)
-        self.image_PIL = cv2.resize(self.image_PIL, self.display_image_size, interpolation=public_resources.display_rescale_methode)
+        self.image_PIL = cv2.resize(self.get_display_image_cv2(index), self.display_image_size, interpolation=public_resources.display_rescale_methode)
         self.image_PIL = Image.fromarray(self.image_PIL)
+
         return self.image_PIL
 
     def get_display_image_cv2(self, index):

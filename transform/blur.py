@@ -5,7 +5,7 @@ from structures import public_resources
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].astype('uint8')
 
     def __on_close():
         settings_window.destroy()

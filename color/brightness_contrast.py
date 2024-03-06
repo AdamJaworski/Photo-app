@@ -1,19 +1,20 @@
 import threading
 import time
 import customtkinter
+import cv2
 from structures import public_resources
 import numpy
 from numba import njit
-from external_c.pyd import brightness_contrast
+#from external_c.pyd import brightness_contrast
 
 last_call = 0
 
 
 @njit(fastmath=True, parallel=True)
 def change_image_contrast_and_brightness(image, contrast: float, brightness: float):
-    image = numpy.power(image, contrast)
-    image = numpy.add(image, brightness)
-    return image
+    image_ = numpy.power(image, contrast)
+    image_ = numpy.add(image_, brightness)
+    return image_
 
 
 @public_resources.image_operation
@@ -42,8 +43,7 @@ def start_gui():
     def __update_image():
         contrast_ = contrast.get() / 2
         brightness_ = brightness.get()
-        public_resources.current_image_class.layers[
-            public_resources.current_image_class.active_layer][0] = change_image_contrast_and_brightness(image_copy, contrast_, brightness_)
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = change_image_contrast_and_brightness(image_copy, contrast_, brightness_)
 
     @public_resources.refresh_viewport
     @public_resources.save_state

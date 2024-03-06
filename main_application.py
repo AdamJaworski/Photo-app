@@ -1,5 +1,6 @@
 import gc
 import sys
+import time
 import warnings
 import psutil
 from PIL import ImageTk
@@ -56,7 +57,7 @@ def __set_image_active(image_: ImageClass):
 def __update_image(image_: ImageClass):
     if image_ is None:
         return
-    image_.get_display_image()
+    image_.get_display_image_as_pillow()
     current_image_label.configure(image=(ImageTk.PhotoImage(image_.image_PIL) if image_.image_PIL is not None else image_.image_PIL))
 
 

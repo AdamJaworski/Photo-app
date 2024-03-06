@@ -9,7 +9,7 @@ b, g, r, a = None, None, None, None
 def start_gui():
     global b, g, r, a
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
-    (b, g, r, a) = cv2.split(image_copy)
+    (r, g, b, a) = cv2.split(image_copy)
 
     def __on_close():
         settings_window.destroy()
@@ -30,10 +30,10 @@ def start_gui():
                 g_ = numpy.multiply(g, slider_g.get())
                 b_ = numpy.multiply(b, slider_b.get())
             else:
-                r_ = numpy.add(r, slider_r.get())
-                g_ = numpy.add(g, slider_g.get())
-                b_ = numpy.add(b, slider_b.get())
-            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = cv2.merge([b_, g_, r_, a])
+                r_ = numpy.add(r, (slider_r.get() - 1) * 15)
+                g_ = numpy.add(g, (slider_g.get() - 1) * 15)
+                b_ = numpy.add(b, (slider_b.get() - 1) * 15)
+            public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = cv2.merge([r_, g_, b_, a])
 
     @public_resources.refresh_viewport
     @public_resources.save_state

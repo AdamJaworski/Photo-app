@@ -1,10 +1,10 @@
-import PIL.Image
+import cv2
 import customtkinter
 import tkinter
 from structures import public_resources
 
 is_app_open = False
-local_rescale_methode: PIL.Image
+local_rescale_methode: cv2
 
 
 def start_gui():
@@ -42,20 +42,18 @@ def start_gui():
     def __change_scaling_methode(choice) -> None:
         global local_rescale_methode
         match choice:
-            case "BICUBIC":
-                local_rescale_methode = PIL.Image.BICUBIC
-            case "BILINEAR":
-                local_rescale_methode = PIL.Image.BILINEAR
+            case "CUBIC":
+                local_rescale_methode = cv2.INTER_CUBIC
+            case "LINEAR":
+                local_rescale_methode = cv2.INTER_LINEAR
             case "NEAREST":
-                local_rescale_methode = PIL.Image.NEAREST
+                local_rescale_methode = cv2.INTER_NEAREST
             case "LANCZOS":
-                local_rescale_methode = PIL.Image.LANCZOS
-            case "BOX":
-                local_rescale_methode = PIL.Image.BOX
-            case "HAMMING":
-                local_rescale_methode = PIL.Image.HAMMING
-            case "":
-                local_rescale_methode = PIL.Image.RES
+                local_rescale_methode = cv2.INTER_LANCZOS4
+            case "BITS":
+                local_rescale_methode = cv2.INTER_BITS
+            case "MAX":
+                local_rescale_methode = cv2.INTER_MAX
             case _:
                 raise UserWarning
 
@@ -75,7 +73,7 @@ def start_gui():
     scale_methode_frame.pack(side="top", fill='x', pady=5)
     customtkinter.CTkLabel(scale_methode_frame, text="Viewport scaling methode: ").pack(side="left", padx=5)
     scale_methode = customtkinter.CTkOptionMenu(scale_methode_frame,
-                                                values=["BICUBIC", "BOX", "BILINEAR", "NEAREST", "LANCZOS", "HAMMING"],
+                                                values=["CUBIC", "BITS", "LINEAR", "NEAREST", "LANCZOS", "MAX"],
                                                 command=__change_scaling_methode, hover=True)
     history_limit_frame = customtkinter.CTkFrame(settings_window, height=25)
     history_limit_frame.pack(side="top", fill='x', pady=5)

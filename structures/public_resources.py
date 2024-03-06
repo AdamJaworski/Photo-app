@@ -2,7 +2,7 @@ import gc
 import threading
 import os
 import psutil
-from PIL.Image import BICUBIC
+import cv2
 from .HistoryLog import HistoryLog
 from .ImageClass import ImageClass
 import time
@@ -14,7 +14,7 @@ def empty_function(*args):
 
 update_viewport_on_new_thread = True
 current_image_class: ImageClass
-display_rescale_methode = BICUBIC
+display_rescale_methode = cv2.INTER_CUBIC
 default_image_height = 600
 default_image_width = 900
 image_size = (900, 600)
@@ -55,7 +55,9 @@ def refresh_viewport(func):
                 return
             update_thread.start()
         else:
+            #start = time.time()
             do_viewport_update(current_image_class)
+            #print(f"Viewport update took: {(time.time() - start).__round__(4)}s to complete")
     return wrapper
 
 

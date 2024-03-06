@@ -23,7 +23,9 @@ def start_gui():
         open_ = cv2.imread(url_var.get(), cv2.IMREAD_UNCHANGED)
         if open_ is not None:
             if open_.shape[2] == 3:
-                open_ = cv2.cvtColor(open_, cv2.COLOR_BGR2BGRA)
+                open_ = cv2.cvtColor(open_, cv2.COLOR_BGR2RGBA)
+            else:
+                open_ = cv2.cvtColor(open_, cv2.COLOR_BGRA2RGBA)
             public_resources.on_image_load(open_)
             __on_close()
         del open_

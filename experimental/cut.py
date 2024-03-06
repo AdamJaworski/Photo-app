@@ -29,15 +29,11 @@ def start_gui():
         lower_color = np.array([EXAMPLE_SLIDER.get(), 0, 0])  # Example: lower bound of color range
         upper_color = np.array([255, EXAMPLE_SLIDER_2.get(), EXAMPLE_SLIDER_2.get()])  # Example: upper bound of color range
 
-        # Create a mask from the color range
         mask = cv2.inRange(cv2.cvtColor(image_copy, cv2.COLOR_BGRA2BGR), lower_color, upper_color)
-        # Convert mask to 4 channel BGRA
-        mask_bgra = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGRA)
-        # Invert mask
-        mask_inv = cv2.bitwise_not(mask_bgra)
-        # Apply the mask to the image
+        mask_rgba = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGBA)
+        mask_inv = cv2.bitwise_not(mask_rgba)
         output = cv2.bitwise_and(image_copy, mask_inv)
-        output[:, :, 3] = np.where(mask==255, 0, 255)  # Set alpha channel to 0 where mask is 255, else 255
+        output[:, :, 3] = np.where(mask==255, 0, 255)
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output
         output = None
 

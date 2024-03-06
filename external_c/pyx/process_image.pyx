@@ -27,3 +27,6 @@ def blend_images(cnp.ndarray dummy_alpha, list layers, cnp.ndarray input):
         output += image
 
     return np.clip(output, 0, 255).astype('uint8')
+
+def clip_image(cnp.ndarray input):
+    return np.clip(input, 0, 255).astype('uint8')

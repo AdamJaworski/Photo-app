@@ -5,7 +5,7 @@ from structures import public_resources
 
 @public_resources.image_operation
 def start_gui():
-    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
+    image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].astype('uint8')
 
     def __on_close():
         settings_window.destroy()
@@ -22,7 +22,7 @@ def start_gui():
             return
         output = cv2.Canny(image_copy, threshold1.get(), threshold2.get())
         public_resources.current_image_class.layers[
-            public_resources.current_image_class.active_layer][0] = cv2.cvtColor(output, cv2.COLOR_GRAY2BGRA)
+            public_resources.current_image_class.active_layer][0] = cv2.cvtColor(output, cv2.COLOR_GRAY2RGBA)
         output = None
 
     @public_resources.refresh_viewport

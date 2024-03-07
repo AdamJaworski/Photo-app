@@ -1,19 +1,23 @@
+import gc
+
 import customtkinter
 import cv2
 from structures import public_resources
 import numpy
-b, g, r, a = None, None, None, None
 
 
 @public_resources.image_operation
 def start_gui():
-    global b, g, r, a
+    global b, g, r, a, image_copy
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
     (r, g, b, a) = cv2.split(image_copy)
 
     def __on_close():
+        global b, g, r, a, image_copy
         settings_window.destroy()
         public_resources.is_image_operation_window_open = False
+        b, g, r, a, image_copy = None, None, None, None, None
+        gc.collect()
 
     @public_resources.refresh_viewport
     def __on_cancel():

@@ -1,3 +1,5 @@
+import gc
+
 import customtkinter
 import cv2
 from structures import public_resources
@@ -5,12 +7,16 @@ from structures import public_resources
 
 @public_resources.image_operation
 def start_gui():
+    global image_copy, image_copy_uint
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
-    image_copy_ = image_copy.astype('uint8')
+    image_copy_uint = image_copy.astype('uint8')
 
     def __on_close():
+        global image_copy, image_copy_uint
         settings_window.destroy()
         public_resources.is_image_operation_window_open = False
+        image_copy, image_copy_uint = None, None
+        gc.collect()
 
     @public_resources.refresh_viewport
     def __on_cancel():
@@ -21,9 +27,9 @@ def start_gui():
     def __on_value_change(event=None):
         if not preview.get():
             return
-        output = cv2.Canny(image_copy_, threshold1.get(), threshold2.get())
+        output = cv2.Canny(image_copy_uint, threshold1.get(), threshold2.get())
         public_resources.current_image_class.layers[
-            public_resources.current_image_class.active_layer][0] = cv2.cvtColor(output, cv2.COLOR_GRAY2RGBA)
+            public_resources.current_image_class.active_layer][0] = cv2.cvtColor(output, cv2.COLOR_GRAY2RGBA).astype('float32')
         output = None
 
     @public_resources.refresh_viewport

@@ -1,3 +1,5 @@
+import gc
+
 import customtkinter
 import cv2
 from structures import public_resources
@@ -6,15 +8,19 @@ import numpy
 
 @public_resources.image_operation
 def start_gui():
+    global h, s, v, alpha, image_copy, image_copy_hsv
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
     image_copy_hsv = cv2.cvtColor( public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0], cv2.COLOR_RGB2HSV)
-    global h, s, v, alpha
+
     h, s, v = cv2.split(image_copy_hsv)
     alpha = image_copy[:, :, 3]
 
     def __on_close():
+        global image_copy, image_copy_hsv, h, s, v, alpha
         settings_window.destroy()
         public_resources.is_image_operation_window_open = False
+        image_copy, h, s, v, alpha, image_copy_hsv = None, None, None, None, None, None
+        gc.collect()
 
     @public_resources.refresh_viewport
     def __on_cancel():
@@ -28,8 +34,8 @@ def start_gui():
             h_ = numpy.multiply(h, slider_h.get())
             s_ = numpy.multiply(s, slider_s.get())
             v_ = numpy.multiply(v, slider_v.get())
-            output_hvs = cv2.merge([h_, s_, v_])
-            output_cv2 = cv2.cvtColor(output_hvs, cv2.COLOR_HSV2RGB)
+            output_cv2 = cv2.merge([h_, s_, v_])
+            output_cv2 = cv2.cvtColor(output_cv2, cv2.COLOR_HSV2RGB)
             output_cv2 = cv2.merge((*cv2.split(output_cv2), alpha))
             public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = output_cv2
 

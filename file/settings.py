@@ -28,8 +28,8 @@ def start_gui():
 
         local_rescale_methode = public_resources.display_rescale_methode
         method_name = None
-        possible_names = ['NEAREST', 'BOX', 'BILINEAR', 'HAMMING', 'BICUBIC', 'LANCZOS']
-        for name, value in vars(PIL.Image).items():
+        possible_names = ['INTER_NEAREST', 'INTER_CUBIC', 'INTER_LINEAR', 'INTER_LANCZOS4', 'INTER_BITS', 'INTER_MAX']
+        for name, value in vars(cv2).items():
             if value == local_rescale_methode:
                 if possible_names.__contains__(name):
                     method_name = name
@@ -88,8 +88,8 @@ def start_gui():
 
     local_rescale_methode = public_resources.display_rescale_methode
     method_name = None
-    possible_names = ['NEAREST', 'BOX', 'BILINEAR', 'HAMMING', 'BICUBIC', 'LANCZOS']
-    for name, value in vars(PIL.Image).items():
+    possible_names = ['INTER_NEAREST', 'INTER_CUBIC', 'INTER_LINEAR', 'INTER_LANCZOS4', 'INTER_BITS', 'INTER_MAX']
+    for name, value in vars(cv2).items():
         if value == local_rescale_methode:
             if possible_names.__contains__(name):
                 method_name = name

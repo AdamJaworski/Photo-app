@@ -1,6 +1,5 @@
 import gc
 import sys
-import time
 import warnings
 import psutil
 from PIL import ImageTk
@@ -13,7 +12,7 @@ import os
 from experimental import blend_layers, cut
 from file import open_image, save_image, settings
 from transform import canny, vignette, blur
-from color import hsv, rgb, brightness_contrast, brightness_contrast_old
+from color import hsv, rgb, brightness_contrast, brightness_contrast_alpha_beta
 from structures import public_resources
 from image import image_history, layers, resize
 from structures.ImageClass import ImageClass
@@ -143,7 +142,7 @@ def color_menu(choice):
         case "Brightness/Contrast":
             brightness_contrast.start_gui()
         case "Brightness/Contrast OLD":
-            brightness_contrast_old.start_gui()
+            brightness_contrast_alpha_beta.start_gui()
         case _:
             raise UserWarning("Not implemented choice")
 
@@ -263,5 +262,7 @@ center_x = int(public_resources.screen_width / 2 - 920 / 2)
 center_y = int(public_resources.screen_height / 2 - 680 / 2)
 app.geometry(f"920x680+{center_x}+{center_y}")
 warnings.filterwarnings("ignore", message="CTkLabel Warning: Given image is not CTkImage but .* Image can not be scaled on HighDPI displays, use CTkImage instead.")
+print(public_resources.display_rescale_methode)
+
 app.mainloop()
 

@@ -26,6 +26,7 @@ def start_gui():
                 open_ = cv2.cvtColor(open_, cv2.COLOR_BGR2RGBA)
             else:
                 open_ = cv2.cvtColor(open_, cv2.COLOR_BGRA2RGBA)
+
             public_resources.on_image_load(open_)
             __on_close()
         del open_

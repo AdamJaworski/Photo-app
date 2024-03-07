@@ -1,3 +1,4 @@
+import gc
 import threading
 import time
 import customtkinter
@@ -19,11 +20,15 @@ def change_image_contrast_and_brightness(image, contrast: float, brightness: flo
 
 @public_resources.image_operation
 def start_gui():
+    global image_copy
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
 
     def __on_close():
+        global image_copy
         settings_window.destroy()
         public_resources.is_image_operation_window_open = False
+        image_copy = None
+        gc.collect()
 
     @public_resources.refresh_viewport
     def __on_cancel():

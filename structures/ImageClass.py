@@ -1,4 +1,3 @@
-import PIL.Image
 import numpy as np
 from PIL import Image
 import cv2
@@ -12,8 +11,9 @@ from external_c.pyd import process_image
 
 @njit(fastmath=True)
 def clip_image(image):
-    image_ = np.clip(image, 0, 255).astype('uint8')
-    return image_
+    # image_ = np.clip(image, 0, 255).astype('uint8')
+    # return image_
+    return image.astype('uint8')
 
 
 def blend_images(dummy_alpha, layers, base_image):
@@ -98,8 +98,11 @@ class ImageClass:
         return self.get_display_image_cv2(index)
 
     def update_display_size(self):
-        self.display_image_size = (int(public_resources.current_width_multiplier * public_resources.default_image_width),
-                                   int(public_resources.current_width_multiplier * public_resources.default_image_width * self.image_ratio))
+        if public_resources.display_real_size:
+            self.display_image_size = self.default_image_size * public_resources.zoom
+        else:
+            self.display_image_size = (int(public_resources.current_width_multiplier * public_resources.default_image_width),
+                                       int(public_resources.current_width_multiplier * public_resources.default_image_width * self.image_ratio))
 
     def create_new_layer(self) -> int:
         self.layers.append([self.image_cv2_on_load.astype('float32'), True])

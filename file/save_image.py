@@ -32,7 +32,7 @@ def start_gui():
             save_name = name.get() + str(i)
             i += 1
         print(save_path)
-        cv2.imwrite(save_path, public_resources.current_image_class.get_save_image_cv2())
+        cv2.imwrite(save_path, cv2.cvtColor(public_resources.current_image_class.get_save_image_cv2(), cv2.COLOR_RGBA2BGRA))
         public_resources.current_image_class.last_save = save_path
         public_resources.current_image_class.save_name = save_name
         threading.Thread(target=public_resources.image_buttons_refresh()).start()

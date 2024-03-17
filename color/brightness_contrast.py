@@ -1,8 +1,8 @@
 import gc
+import os
 import threading
 import time
 import customtkinter
-import cv2
 from structures import public_resources
 import numpy
 from numba import njit
@@ -50,11 +50,12 @@ def start_gui():
         brightness_ = brightness.get()
         public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = change_image_contrast_and_brightness(image_copy, contrast_, brightness_)
 
-    @public_resources.refresh_viewport
     @public_resources.save_state
     def __on_apply():
         preview.select(1)
         __on_value_change()
+        time.sleep(0.1)
+        public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0] = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].astype('float32')
         __on_close()
         return "Brightness/Contrast"
 

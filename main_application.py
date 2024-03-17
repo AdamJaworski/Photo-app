@@ -262,7 +262,6 @@ center_x = int(public_resources.screen_width / 2 - 920 / 2)
 center_y = int(public_resources.screen_height / 2 - 680 / 2)
 app.geometry(f"920x680+{center_x}+{center_y}")
 warnings.filterwarnings("ignore", message="CTkLabel Warning: Given image is not CTkImage but .* Image can not be scaled on HighDPI displays, use CTkImage instead.")
-print(public_resources.display_rescale_methode)
 
 app.mainloop()
 

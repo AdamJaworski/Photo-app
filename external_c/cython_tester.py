@@ -1,7 +1,6 @@
 import time
 from numba import jit
 
-
 @jit
 def sum_up_to_n(n):
     sum = 0

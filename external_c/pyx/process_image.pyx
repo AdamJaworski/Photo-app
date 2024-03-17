@@ -2,7 +2,7 @@
 
 import numpy as np
 cimport numpy as cnp
-import cv2
+import cv2  
 
 def blend_images(cnp.ndarray dummy_alpha, list layers, cnp.ndarray input):
     cdef cnp.ndarray output = np.copy(input)    # This is over 50% time on 1 layer

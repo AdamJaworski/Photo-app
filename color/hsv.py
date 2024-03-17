@@ -9,8 +9,9 @@ import numpy
 @public_resources.image_operation
 def start_gui():
     global h, s, v, alpha, image_copy, image_copy_hsv
+    print(public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0].dtype)
     image_copy = public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0]
-    image_copy_hsv = cv2.cvtColor( public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0], cv2.COLOR_RGB2HSV)
+    image_copy_hsv = cv2.cvtColor(public_resources.current_image_class.layers[public_resources.current_image_class.active_layer][0], cv2.COLOR_RGB2HSV)
 
     h, s, v = cv2.split(image_copy_hsv)
     alpha = image_copy[:, :, 3]
